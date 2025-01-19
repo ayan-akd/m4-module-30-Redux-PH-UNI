@@ -1,11 +1,10 @@
 import AcademicSemester from "@/pages/admin/academicManagement/AcademicSemester";
 import AdminDashboard from "../pages/admin/AdminDashboard";
-import CreateAdmin from "../pages/admin/CreateAdmin";
-import CreateFaculty from "../pages/admin/CreateFaculty";
-import CreateStudent from "../pages/admin/CreateStudent";
+import CreateAdmin from "../pages/admin/userManagement/CreateAdmin";
+import CreateFaculty from "../pages/admin/userManagement/CreateFaculty";
+import CreateStudent from "../pages/admin/userManagement/CreateStudent";
 import AcademicFaculty from "@/pages/admin/academicManagement/AcademicFaculty";
 import AcademicDepartment from "@/pages/admin/academicManagement/AcademicDepartment";
-
 
 export const adminPaths = [
   {
@@ -31,7 +30,7 @@ export const adminPaths = [
         path: "academic-department",
         element: <AcademicDepartment />,
       },
-    ]
+    ],
   },
   {
     name: "User Management",
