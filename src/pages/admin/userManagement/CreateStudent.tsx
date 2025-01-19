@@ -9,6 +9,7 @@ import SkeletonInput from "antd/es/skeleton/Input";
 import PHDatePicker from "@/components/form/PHDatePicker";
 import { useAddStudentMutation } from "@/redux/features/admin/User Management/userManagement.api";
 import { toast } from "sonner";
+import PHDragger from "@/components/form/PHDragger";
 
 const studentDefaultValues = {
   name: {
@@ -69,8 +70,10 @@ export default function CreateStudent() {
     };
     const formData = new FormData();
     formData.append("data", JSON.stringify(studentData));
+    formData.append("file", data.image.originFileObj);
     try {
       const res = await addStudent(formData);
+      console.log(res);
       if (res.data) {
         toast.success("Student Added Successfully", {
           id: toastId,
@@ -110,6 +113,9 @@ export default function CreateStudent() {
                 label="Blood Group"
                 options={bloodGroupOptions}
               />
+            </Col>
+            <Col span={24}>
+              <PHDragger name="image" label="Profile Image" />
             </Col>
             <Divider>Contact Info.</Divider>
             <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
