@@ -10,10 +10,10 @@ export type TError = {
 };
 
 export type TMeta = {
-  limit: number;
   page: number;
-  total: number;
-  totalPages: number;
+  limit: number;
+  totalDocuments: number;
+  totalPage: number;
 };
 
 export type TResponse<T> = {

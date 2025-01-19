@@ -1,35 +1,37 @@
-import { TQueryParams } from "@/types";
-import { TAcademicSemester } from "@/types/academicManagement.type";
-import { Button, Table, TableColumnsType, TableProps } from "antd";
+import { TQueryParams, TStudent } from "@/types";
+import { Button, Pagination, Table, TableColumnsType, TableProps } from "antd";
 import { useState } from "react";
-import CreateAcademicSemesterModal from "@/components/modal/CreateAcademicSemesterModal";
-import EditAcademicSemesterModal from "@/components/modal/EditAcademicSemesterModal";
 import { alertModal } from "@/components/modal/alertModal";
 import { toast } from "sonner";
 import { academicManagementHooks } from "@/hooks/academicManagementHooks";
+import { useGetAllStudentsQuery } from "@/redux/features/admin/User Management/userManagement.api";
+import { Link } from "react-router-dom";
 
-export type TSemesterTableData = Pick<
-  TAcademicSemester,
-  "_id" | "name" | "year" | "startMonth" | "endMonth"
->;
+export type TStudentTableData = Pick<TStudent, "fullName" | "id" | "email" | "contactNo">;
 
-export default function AcademicSemester() {
+export default function StudentData() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [record, setRecord] = useState<TSemesterTableData>();
+  const [record, setRecord] = useState<TStudentTableData>();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [params, setParams] = useState<TQueryParams[]>([]);
-  const { useGetAllSemestersQuery, useDeleteAcademicSemesterMutation } =
-    academicManagementHooks;
-  const { data: semesterData, isFetching } = useGetAllSemestersQuery(params);
+  const [page, setPage] = useState(1);
+  const { useDeleteAcademicSemesterMutation } = academicManagementHooks;
+  const { data: studentsData, isFetching } = useGetAllStudentsQuery([
+    { name: "page", value: page },
+    { name: "sort", value: "id" },
+    ...params,
+  ]);
   const [deleteAcademicSemester] = useDeleteAcademicSemesterMutation();
 
-  const tableData = semesterData?.data?.map((semester: TAcademicSemester) => ({
-    key: semester._id,
-    _id: semester._id,
-    name: semester.name,
-    year: semester.year,
-    startMonth: semester.startMonth,
-    endMonth: semester.endMonth,
+  const metaData = studentsData?.meta;
+  console.log(metaData);
+
+  const tableData = studentsData?.data?.map((student: TStudent) => ({
+    key: student._id,
+    fullName: student.fullName,
+    id: student.id,
+    email: student.email,
+    contactNo: student.contactNo,
   }));
 
   const showAddModal = () => {
@@ -55,69 +57,39 @@ export default function AcademicSemester() {
     }
   };
 
-  const columns: TableColumnsType<TSemesterTableData> = [
+  const columns: TableColumnsType<TStudentTableData> = [
     {
       title: "Name",
-      dataIndex: "name",
+      dataIndex: "fullName",
       showSorterTooltip: { target: "full-header" },
-      filters: [
-        {
-          text: "Summer",
-          value: "Summer",
-        },
-        {
-          text: "Autumn",
-          value: "Autumn",
-        },
-        {
-          text: "Fall",
-          value: "Fall",
-        },
-      ],
+    },
+
+    {
+      title: "Roll No.",
+      dataIndex: "id",
     },
     {
-      title: "Year",
-      dataIndex: "year",
-      filters: [
-        {
-          text: "2025",
-          value: "2025",
-        },
-        {
-          text: "2026",
-          value: "2026",
-        },
-        {
-          text: "2027",
-          value: "2027",
-        },
-        {
-          text: "2028",
-          value: "2028",
-        },
-        {
-          text: "2029",
-          value: "2029",
-        },
-      ],
+      title: "Email",
+      dataIndex: "email",
     },
     {
-      title: "Start Month",
-      dataIndex: "startMonth",
-    },
-    {
-      title: "End Month",
-      dataIndex: "endMonth",
+      title: "Contact No.",
+      dataIndex: "contactNo",
     },
     {
       title: "Actions",
+      width: "1%",
+      align: "center",
       render: (record) => {
-        const showEditModal = (record: TSemesterTableData) => () => {
+        const showEditModal = (record: TStudentTableData) => () => {
           setIsEditModalOpen(true);
           setRecord(record);
         };
         return (
           <div className="flex gap-2">
+            <Link to={`/admin/student-details/${record.key}`}>
+            <Button type="primary">Details</Button>
+            </Link>
             <Button onClick={showEditModal(record)} type="primary">
               Edit
             </Button>
@@ -126,8 +98,8 @@ export default function AcademicSemester() {
               danger
               onClick={() =>
                 alertModal(
-                  "Are you sure you want to delete this semester ?",
-                  `${record.name}  ${record.year} semester will be deleted`,
+                  "Are you sure you want to delete this student ?",
+                  `${record.name} student will be deleted`,
                   () => handleDelete(record.key)
                 )
               }
@@ -140,7 +112,7 @@ export default function AcademicSemester() {
     },
   ];
 
-  const onChange: TableProps<TSemesterTableData>["onChange"] = (
+  const onChange: TableProps<TStudentTableData>["onChange"] = (
     _pagination,
     filters,
     _sorter,
@@ -160,21 +132,29 @@ export default function AcademicSemester() {
 
   return (
     <div>
-      <h1 className="text-center mb-5 text-xl font-bold">Academic Semester</h1>
+      <h1 className="text-center mb-5 text-xl font-bold">Students</h1>
       <div className="flex justify-end mb-5">
         <Button onClick={showAddModal} type="primary">
-          Add Semester
+          Add Student
         </Button>
       </div>
-      <Table<TSemesterTableData>
+      <Table<TStudentTableData>
         loading={isFetching}
         columns={columns}
         dataSource={tableData}
         onChange={onChange}
         showSorterTooltip={{ target: "sorter-icon" }}
         style={{ overflow: "scroll" }}
+        pagination={false}
       />
-      {isModalOpen ? (
+      <Pagination
+        current={page}
+        align="center"
+        pageSize={metaData?.limit}
+        total={metaData?.totalDocuments}
+        onChange={(page) => setPage(page)}
+      />
+      {/* {isModalOpen ? (
         <CreateAcademicSemesterModal
           showModal={true}
           setIsModalOpen={setIsModalOpen}
@@ -190,7 +170,7 @@ export default function AcademicSemester() {
         ></EditAcademicSemesterModal>
       ) : (
         ""
-      )}
+      )} */}
     </div>
   );
 }

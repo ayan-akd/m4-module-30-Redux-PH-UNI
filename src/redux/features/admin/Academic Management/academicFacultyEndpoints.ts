@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { TQueryParams, TResponseRedux } from "@/types";
-import { TAcademicSemester } from "@/types/academicManagement.type";
+import { TAcademicFaculty, TAcademicSemester } from "@/types/academicManagement.type";
 import { EndpointBuilder } from "@reduxjs/toolkit/query";
 
 export const academicFacultyEndpoints = (
@@ -21,7 +21,7 @@ export const academicFacultyEndpoints = (
       };
     },
     providesTags: ["academic-faculty"],
-    transformResponse: (response: TResponseRedux<TAcademicSemester[]>) => {
+    transformResponse: (response: TResponseRedux<TAcademicFaculty[]>) => {
       return {
         data: response.data,
         meta: response.meta,
@@ -29,7 +29,7 @@ export const academicFacultyEndpoints = (
     },
   }),
   addAcademicFaculty: builder.mutation({
-    query: (data: TAcademicSemester) => ({
+    query: (data: TAcademicFaculty) => ({
       url: "/academic-faculties/create-academic-faculty",
       method: "POST",
       body: data,

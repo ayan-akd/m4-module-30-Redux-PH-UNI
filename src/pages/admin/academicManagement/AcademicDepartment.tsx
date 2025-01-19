@@ -83,7 +83,7 @@ export default function AcademicDepartment() {
     },
 
     {
-      title: "Action",
+      title: "Actions",
       align: "center",
       render: (record) => {
         const showEditModal = (record: TAcademicDepartmentTableData) => () => {

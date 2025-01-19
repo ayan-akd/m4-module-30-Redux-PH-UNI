@@ -18,7 +18,7 @@ export default function AcademicFaculty() {
   const { useGetAllAcademicFacultyQuery, useDeleteAcademicFacultyMutation } =
     academicManagementHooks;
   const [deleteAcademicFaculty] = useDeleteAcademicFacultyMutation();
- const { data: academicFacultyData, isFetching } =
+  const { data: academicFacultyData, isFetching } =
     useGetAllAcademicFacultyQuery(params);
   const tableData = academicFacultyData?.data?.map(
     (faculty: TAcademicFaculty) => ({
@@ -67,7 +67,7 @@ export default function AcademicFaculty() {
     },
 
     {
-      title: "Action",
+      title: "Actions",
       align: "center",
       render: (record) => {
         const showEditModal = (record: TAcademicFacultyTableData) => () => {
