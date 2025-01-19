@@ -1,16 +1,54 @@
 import PHForm from "@/components/form/PHForm";
 import PHInput from "@/components/form/PHInput";
 import PHSelect from "@/components/form/PHSelect";
-import { Button, Col, Divider, Row, } from "antd";
+import { Button, Col, Divider, Row } from "antd";
 import { FieldValues, SubmitHandler } from "react-hook-form";
 import { bloodGroupOptions, genderOptions } from "./userManagementConstants";
-import { academicSemesterOptions } from "../academicManagement/AcademicManagementConstants";
 import { academicManagementHooks } from "@/hooks/academicManagementHooks";
 import SkeletonInput from "antd/es/skeleton/Input";
+import PHDatePicker from "@/components/form/PHDatePicker";
+
+const studentDefaultValues = {
+  name: {
+    firstName: "Diana",
+    middleName: "Elena",
+    lastName: "Martinez",
+  },
+  gender: "female",
+  email: "de2.martinez@example.com",
+  contactNo: "+1234567895",
+  emergencyContactNo: "+0987654326",
+  bloodGroup: "O-",
+  presentAddress: "128 Elm Street, Springfield",
+  permanentAddress: "461 Oak Avenue, Springfield",
+  guardian: {
+    fatherName: "George Martinez",
+    fatherOccupation: "Lawyer",
+    fatherContactNo: "+1122334500",
+    motherName: "Isabella Martinez",
+    motherOccupation: "Artist",
+    motherContactNo: "+5566778894",
+  },
+  localGuardian: {
+    name: "Chris Griffin",
+    occupation: "Musician",
+    contactNo: "+6677889905",
+    address: "794 Pine Lane, Springfield",
+  },
+  admissionSemester: "01",
+  academicDepartment: "67583d6e053794374f6b6b0c",
+};
 
 export default function CreateStudent() {
-  const { useGetAllAcademicDepartmentQuery } = academicManagementHooks;
-  const { data: academicDepartmentData, isFetching } =
+  const { useGetAllSemestersQuery, useGetAllAcademicDepartmentQuery } =
+    academicManagementHooks;
+  const { data: semesterData, isFetching: sIsFetching } =
+    useGetAllSemestersQuery(undefined);
+    const academicSemesterOptions = semesterData?.data?.map((semester: { _id: string; name: string, year: number }) => ({
+        value: semester._id,
+      label: `${semester.name} ${semester.year}`,
+    }));
+  const { data: academicDepartmentData, isFetching: dIsFetching } =
     useGetAllAcademicDepartmentQuery();
   const academicDepartmentOptions = academicDepartmentData?.data?.map(
     (department: { _id: string; name: string }) => ({
@@ -27,9 +65,9 @@ export default function CreateStudent() {
   return (
     <Row>
       <Col span={24}>
-        <PHForm onSubmit={onSubmit}>
-          <Divider>Personal Info</Divider>
+        <PHForm onSubmit={onSubmit} defaultValues={studentDefaultValues}>
           <Row gutter={8}>
+            <Divider>Personal Info</Divider>
             <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
               <PHInput name="name.firstName" label="First Name" type="text" />
             </Col>
@@ -43,7 +81,7 @@ export default function CreateStudent() {
               <PHSelect name="gender" label="Gender" options={genderOptions} />
             </Col>
             <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
-              <PHInput name="dateOfBirth" label="Date of Birth" type="date" />
+              <PHDatePicker name="dateOfBirth" label="Date of Birth" />
             </Col>
             <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
               <PHSelect
@@ -150,25 +188,29 @@ export default function CreateStudent() {
             </Col>
             <Divider>Academic Info.</Divider>
             <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
-              <PHSelect
-                name="academicSemester"
-                label="Academic Semester"
-                options={academicSemesterOptions}
-              />
-            </Col>
-            <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
-             {
-                isFetching ? (
+              {
+                dIsFetching ? (
                   <SkeletonInput active size="large" />
                 ) : (
-                  <PHSelect
-                    name="academicDepartment"
-                    label="Academic Department"
-                    options={academicDepartmentOptions}
+                    <PHSelect
+                    name="academicSemester"
+                    label="Academic Semester"
+                    options={academicSemesterOptions}
                   />
                 )
-             }
-             </Col>
+              }
+            </Col>
+            <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
+              {dIsFetching ? (
+                <SkeletonInput active size="large" />
+              ) : (
+                <PHSelect
+                  name="academicDepartment"
+                  label="Academic Department"
+                  options={academicDepartmentOptions}
+                />
+              )}
+            </Col>
           </Row>
           <Button type="primary" htmlType="submit">
             Submit
