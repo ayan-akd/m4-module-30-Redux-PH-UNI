@@ -7,6 +7,8 @@ import { bloodGroupOptions, genderOptions } from "./userManagementConstants";
 import { academicManagementHooks } from "@/hooks/academicManagementHooks";
 import SkeletonInput from "antd/es/skeleton/Input";
 import PHDatePicker from "@/components/form/PHDatePicker";
+import { useAddStudentMutation } from "@/redux/features/admin/User Management/userManagement.api";
+import { toast } from "sonner";
 
 const studentDefaultValues = {
   name: {
@@ -15,7 +17,7 @@ const studentDefaultValues = {
     lastName: "Martinez",
   },
   gender: "female",
-  email: "de2.martinez@example.com",
+  email: "de5.martinez@example.com",
   contactNo: "+1234567895",
   emergencyContactNo: "+0987654326",
   bloodGroup: "O-",
@@ -35,19 +37,22 @@ const studentDefaultValues = {
     contactNo: "+6677889905",
     address: "794 Pine Lane, Springfield",
   },
-  admissionSemester: "01",
+  admissionSemester: "6788f6327bb0785b01dffced",
   academicDepartment: "67583d6e053794374f6b6b0c",
 };
 
 export default function CreateStudent() {
+  const [addStudent] = useAddStudentMutation();
   const { useGetAllSemestersQuery, useGetAllAcademicDepartmentQuery } =
     academicManagementHooks;
   const { data: semesterData, isFetching: sIsFetching } =
     useGetAllSemestersQuery(undefined);
-    const academicSemesterOptions = semesterData?.data?.map((semester: { _id: string; name: string, year: number }) => ({
-        value: semester._id,
+  const academicSemesterOptions = semesterData?.data?.map(
+    (semester: { _id: string; name: string; year: number }) => ({
+      value: semester._id,
       label: `${semester.name} ${semester.year}`,
-    }));
+    })
+  );
   const { data: academicDepartmentData, isFetching: dIsFetching } =
     useGetAllAcademicDepartmentQuery();
   const academicDepartmentOptions = academicDepartmentData?.data?.map(
@@ -56,11 +61,27 @@ export default function CreateStudent() {
       value: department._id,
     })
   );
-  const onSubmit: SubmitHandler<FieldValues> = (data) => {
-    console.log(data);
-    // const formData = new FormData();
-    // formData.append("name", data.name);
-    // console.log(Object.fromEntries(formData));
+  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+    const toastId = toast.loading("Adding Student....");
+    const studentData = {
+      password: "student123",
+      student: data,
+    };
+    const formData = new FormData();
+    formData.append("data", JSON.stringify(studentData));
+    try {
+      const res = await addStudent(formData);
+      if (res.data) {
+        toast.success("Student Added Successfully", {
+          id: toastId,
+        });
+      }
+      if (res.error) {
+        toast.dismiss(toastId);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
   return (
     <Row>
@@ -188,17 +209,15 @@ export default function CreateStudent() {
             </Col>
             <Divider>Academic Info.</Divider>
             <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
-              {
-                dIsFetching ? (
-                  <SkeletonInput active size="large" />
-                ) : (
-                    <PHSelect
-                    name="academicSemester"
-                    label="Academic Semester"
-                    options={academicSemesterOptions}
-                  />
-                )
-              }
+              {sIsFetching ? (
+                <SkeletonInput active size="large" />
+              ) : (
+                <PHSelect
+                  name="admissionSemester"
+                  label="Admission Semester"
+                  options={academicSemesterOptions}
+                />
+              )}
             </Col>
             <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
               {dIsFetching ? (
@@ -206,7 +225,7 @@ export default function CreateStudent() {
               ) : (
                 <PHSelect
                   name="academicDepartment"
-                  label="Academic Department"
+                  label="Admission Department"
                   options={academicDepartmentOptions}
                 />
               )}
