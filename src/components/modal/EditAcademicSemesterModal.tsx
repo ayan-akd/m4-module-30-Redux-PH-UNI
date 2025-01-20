@@ -1,5 +1,5 @@
 import { Modal } from "antd";
-import EditAcademicSemester from "../EditAcademicSemester";
+import EditAcademicSemester from "../academicManagementComponents/EditAcademicSemester";
 import { TSemesterTableData } from "@/pages/admin/academicManagement/AcademicSemester";
 
 export default function EditAcademicSemesterModal({

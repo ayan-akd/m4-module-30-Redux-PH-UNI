@@ -1,4 +1,4 @@
-import CreateAcademicFaculty from "../CreateAcademicFaculty";
+import CreateAcademicFaculty from "../academicManagementComponents/CreateAcademicFaculty";
 import { Modal } from "antd";
 
 export default function CreateAcademicFacultyModal({

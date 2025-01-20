@@ -17,7 +17,7 @@ const userManagementApi = baseApi.injectEndpoints({
            params,
          };
        },
-       providesTags: ["academic-semester"],
+       providesTags: ["student"],
        transformResponse: (response: TResponseRedux<TStudent[]>) => {
          return {
            data: response.data,
@@ -30,7 +30,8 @@ const userManagementApi = baseApi.injectEndpoints({
         url: "/users/create-student",
         method: "POST",
         body: data,
-      })
+      }),
+      invalidatesTags: ["student"],
     }),
   }),
 });

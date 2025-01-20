@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { academicManagementHooks } from "@/hooks/academicManagementHooks";
 import { useGetAllStudentsQuery } from "@/redux/features/admin/User Management/userManagement.api";
 import { Link } from "react-router-dom";
+import CreateStudentModal from "@/components/modal/CreateStudentModal";
 
 export type TStudentTableData = Pick<TStudent, "fullName" | "id" | "email" | "contactNo">;
 
@@ -24,7 +25,6 @@ export default function StudentData() {
   const [deleteAcademicSemester] = useDeleteAcademicSemesterMutation();
 
   const metaData = studentsData?.meta;
-  console.log(metaData);
 
   const tableData = studentsData?.data?.map((student: TStudent) => ({
     key: student._id,
@@ -154,15 +154,15 @@ export default function StudentData() {
         total={metaData?.totalDocuments}
         onChange={(page) => setPage(page)}
       />
-      {/* {isModalOpen ? (
-        <CreateAcademicSemesterModal
+      {isModalOpen ? (
+        <CreateStudentModal
           showModal={true}
           setIsModalOpen={setIsModalOpen}
-        ></CreateAcademicSemesterModal>
+        ></CreateStudentModal>
       ) : (
         ""
       )}
-      {isEditModalOpen && record ? (
+      {/* {isEditModalOpen && record ? (
         <EditAcademicSemesterModal
           record={record}
           showModal={true}

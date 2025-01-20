@@ -8,13 +8,19 @@ type TSelectProps = {
   disabled?: boolean;
 };
 
-export default function PHSelect({ label, name, options, disabled }: TSelectProps) {
+export default function PHSelect({
+  label,
+  name,
+  options,
+  disabled,
+}: TSelectProps) {
   return (
     <Controller
       name={name}
       render={({ field, fieldState: { error } }) => (
         <Form.Item label={label}>
           <Select
+            variant="filled"
             style={{ width: "100%" }}
             size="large"
             {...field}

@@ -1,4 +1,4 @@
-import CreateAcademicSemester from "../CreateAcademicSemester";
+import CreateAcademicSemester from "../academicManagementComponents/CreateAcademicSemester";
 import { Modal } from "antd";
 
 export default function CreateAcademicSemesterModal({

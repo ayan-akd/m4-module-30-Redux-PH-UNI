@@ -13,7 +13,7 @@ export default function PHInput({ type, name, label }: TInputProps) {
         name={name}
         render={({ field, fieldState: { error }  }) => (
           <Form.Item label={label}>
-            <Input {...field} id={name} type={type} size="large" />
+            <Input variant="filled" {...field} id={name} type={type} size="large" />
             {error && <small style={{ color: "red" }}>{error.message}</small>}
           </Form.Item>
         )}

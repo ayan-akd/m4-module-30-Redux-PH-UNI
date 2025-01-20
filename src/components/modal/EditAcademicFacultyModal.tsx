@@ -1,6 +1,6 @@
 import { Modal } from "antd";
 import { TAcademicFacultyTableData } from "@/pages/admin/academicManagement/AcademicFaculty";
-import EditAcademicFaculty from "../EditAcademicFaculty";
+import EditAcademicFaculty from "../academicManagementComponents/EditAcademicFaculty";
 
 export default function EditAcademicFacultyModal({
   record,

@@ -1,6 +1,6 @@
 import CreateAdmin from "../pages/admin/userManagement/CreateAdmin";
 import CreateFaculty from "../pages/admin/userManagement/CreateFaculty";
-import CreateStudent from "../pages/admin/userManagement/CreateStudent";
+import CreateStudent from "../components/userManagementComponents/CreateStudent";
 import StudentDashboard from "../pages/student/StudentDashboard";
 
 export const studentPaths = [

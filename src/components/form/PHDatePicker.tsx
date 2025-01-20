@@ -12,7 +12,7 @@ export default function PHDatePicker({ name, label }: TDatePickerProps) {
         name={name}
         render={({ field, fieldState: { error }  }) => (
           <Form.Item label={label}>
-            <DatePicker {...field} size="large" style={{ width: "100%" }} />
+            <DatePicker variant="filled" {...field} size="large" style={{ width: "100%" }} />
             {error && <small style={{ color: "red" }}>{error.message}</small>}
           </Form.Item>
         )}

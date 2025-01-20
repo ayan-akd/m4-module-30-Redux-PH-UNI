@@ -1,9 +1,13 @@
+import React, { useState } from "react";
 import PHForm from "@/components/form/PHForm";
 import PHInput from "@/components/form/PHInput";
 import PHSelect from "@/components/form/PHSelect";
 import { Button, Col, Divider, Row } from "antd";
 import { FieldValues, SubmitHandler } from "react-hook-form";
-import { bloodGroupOptions, genderOptions } from "./userManagementConstants";
+import {
+  bloodGroupOptions,
+  genderOptions,
+} from "../../pages/admin/userManagement/userManagementConstants";
 import { academicManagementHooks } from "@/hooks/academicManagementHooks";
 import SkeletonInput from "antd/es/skeleton/Input";
 import PHDatePicker from "@/components/form/PHDatePicker";
@@ -11,38 +15,33 @@ import { useAddStudentMutation } from "@/redux/features/admin/User Management/us
 import { toast } from "sonner";
 import PHDragger from "@/components/form/PHDragger";
 
-const studentDefaultValues = {
-  name: {
-    firstName: "Diana",
-    middleName: "Elena",
-    lastName: "Martinez",
-  },
-  gender: "female",
-  email: "de5.martinez@example.com",
-  contactNo: "+1234567895",
-  emergencyContactNo: "+0987654326",
-  bloodGroup: "O-",
-  presentAddress: "128 Elm Street, Springfield",
-  permanentAddress: "461 Oak Avenue, Springfield",
-  guardian: {
-    fatherName: "George Martinez",
-    fatherOccupation: "Lawyer",
-    fatherContactNo: "+1122334500",
-    motherName: "Isabella Martinez",
-    motherOccupation: "Artist",
-    motherContactNo: "+5566778894",
-  },
-  localGuardian: {
-    name: "Chris Griffin",
-    occupation: "Musician",
-    contactNo: "+6677889905",
-    address: "794 Pine Lane, Springfield",
-  },
-  admissionSemester: "6788f6327bb0785b01dffced",
-  academicDepartment: "67583d6e053794374f6b6b0c",
-};
+const steps = [
+  "Personal Info",
+  "Contact Info",
+  "Guardian Info",
+  "Local Guardian Info",
+  "Academic Info",
+];
 
-export default function CreateStudent() {
+export default function CreateStudent({
+  setIsModalOpen,
+}: {
+  setIsModalOpen: (isOpen: boolean) => void;
+}) {
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const handleNext = () => {
+    setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
+  };
+
+  const handlePrevious = () => {
+    setCurrentStep((prev) => Math.max(prev - 1, 0));
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
   const [addStudent] = useAddStudentMutation();
   const { useGetAllSemestersQuery, useGetAllAcademicDepartmentQuery } =
     academicManagementHooks;
@@ -62,6 +61,7 @@ export default function CreateStudent() {
       value: department._id,
     })
   );
+
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     const toastId = toast.loading("Adding Student....");
     const studentData = {
@@ -73,148 +73,122 @@ export default function CreateStudent() {
     formData.append("file", data.image.originFileObj);
     try {
       const res = await addStudent(formData);
-      console.log(res);
       if (res.data) {
-        toast.success("Student Added Successfully", {
-          id: toastId,
-        });
-      }
-      if (res.error) {
+        toast.success("Student Added Successfully", { id: toastId });
+        setIsModalOpen(false);
+      } else {
         toast.dismiss(toastId);
       }
     } catch (error) {
       console.log(error);
     }
   };
+
   return (
-    <Row>
-      <Col span={24}>
-        <PHForm onSubmit={onSubmit} defaultValues={studentDefaultValues}>
-          <Row gutter={8}>
-            <Divider>Personal Info</Divider>
-            <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
+    <PHForm onSubmit={onSubmit}>
+      <Row>
+        <Col span={24}>
+          {currentStep === 0 && (
+            <>
+              <Divider>Personal Info</Divider>
               <PHInput name="name.firstName" label="First Name" type="text" />
-            </Col>
-            <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
               <PHInput name="name.middleName" label="Middle Name" type="text" />
-            </Col>
-            <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
               <PHInput name="name.lastName" label="Last Name" type="text" />
-            </Col>
-            <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
               <PHSelect name="gender" label="Gender" options={genderOptions} />
-            </Col>
-            <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
               <PHDatePicker name="dateOfBirth" label="Date of Birth" />
-            </Col>
-            <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
               <PHSelect
                 name="bloodGroup"
                 label="Blood Group"
                 options={bloodGroupOptions}
               />
-            </Col>
-            <Col span={24}>
               <PHDragger name="image" label="Profile Image" />
-            </Col>
-            <Divider>Contact Info.</Divider>
-            <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
+            </>
+          )}
+
+          {currentStep === 1 && (
+            <>
+              <Divider>Contact Info</Divider>
               <PHInput name="email" label="Email" type="email" />
-            </Col>
-            <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
               <PHInput name="contactNo" label="Contact No." type="text" />
-            </Col>
-            <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
               <PHInput
                 name="emergencyContactNo"
                 label="Emergency Contact No."
                 type="text"
               />
-            </Col>
-            <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
               <PHInput
                 name="presentAddress"
                 label="Present Address"
                 type="text"
               />
-            </Col>
-            <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
               <PHInput
                 name="permanentAddress"
                 label="Permanent Address"
                 type="text"
               />
-            </Col>
-            <Divider>Guardian</Divider>
-            <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
+            </>
+          )}
+
+          {currentStep === 2 && (
+            <>
+              <Divider>Guardian Info</Divider>
               <PHInput
                 name="guardian.fatherName"
                 label="Father Name"
                 type="text"
               />
-            </Col>
-            <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
               <PHInput
                 name="guardian.fatherOccupation"
                 label="Father Occupation"
                 type="text"
               />
-            </Col>
-            <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
               <PHInput
                 name="guardian.fatherContactNo"
                 label="Father Contact No."
                 type="text"
               />
-            </Col>
-            <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
               <PHInput
                 name="guardian.motherName"
                 label="Mother Name"
                 type="text"
               />
-            </Col>
-            <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
               <PHInput
                 name="guardian.motherOccupation"
                 label="Mother Occupation"
                 type="text"
               />
-            </Col>
-            <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
               <PHInput
                 name="guardian.motherContactNo"
                 label="Mother Contact No."
                 type="text"
               />
-            </Col>
-            <Divider>Local Guardian</Divider>
-            <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
+            </>
+          )}
+
+          {currentStep === 3 && (
+            <>
+              <Divider>Local Guardian Info</Divider>
               <PHInput name="localGuardian.name" label="Name" type="text" />
-            </Col>
-            <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
               <PHInput
                 name="localGuardian.occupation"
                 label="Occupation"
                 type="text"
               />
-            </Col>
-            <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
               <PHInput
                 name="localGuardian.contactNo"
                 label="Contact No."
                 type="text"
               />
-            </Col>
-            <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
               <PHInput
                 name="localGuardian.address"
                 label="Address"
                 type="text"
               />
-            </Col>
-            <Divider>Academic Info.</Divider>
-            <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
+            </>
+          )}
+
+          {currentStep === 4 && (
+            <>
+              <Divider>Academic Info</Divider>
               {sIsFetching ? (
                 <SkeletonInput active size="large" />
               ) : (
@@ -224,8 +198,6 @@ export default function CreateStudent() {
                   options={academicSemesterOptions}
                 />
               )}
-            </Col>
-            <Col span={24} md={{ span: 12 }} lg={{ span: 8 }}>
               {dIsFetching ? (
                 <SkeletonInput active size="large" />
               ) : (
@@ -235,13 +207,30 @@ export default function CreateStudent() {
                   options={academicDepartmentOptions}
                 />
               )}
-            </Col>
-          </Row>
+            </>
+          )}
+        </Col>
+      </Row>
+      <div className="flex justify-center gap-2">
+        {currentStep > 0 && (
+          <Button type="primary" onClick={handlePrevious}>
+            Previous
+          </Button>
+        )}
+        {currentStep < steps.length - 1 && (
+          <Button type="primary" onClick={handleNext}>
+            Next
+          </Button>
+        )}
+        {currentStep === steps.length - 1 && (
           <Button type="primary" htmlType="submit">
             Submit
           </Button>
-        </PHForm>
-      </Col>
-    </Row>
+        )}
+        <Button onClick={handleCancel} type="primary" danger>
+          Cancel
+        </Button>
+      </div>
+    </PHForm>
   );
 }

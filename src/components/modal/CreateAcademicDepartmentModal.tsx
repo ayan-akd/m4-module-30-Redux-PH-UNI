@@ -1,4 +1,4 @@
-import CreateAcademicDepartment from "../CreateAcademicDepartment";
+import CreateAcademicDepartment from "../academicManagementComponents/CreateAcademicDepartment";
 import { Modal } from "antd";
 
 export default function CreateAcademicDepartmentModal({

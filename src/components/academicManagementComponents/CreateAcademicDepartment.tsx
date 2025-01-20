@@ -1,19 +1,18 @@
 import PHForm from "@/components/form/PHForm";
 import { Button, Col, Flex } from "antd";
 import { FieldValues, SubmitHandler } from "react-hook-form";
+import { academicDepartmentSchema } from "@/schemas/academicManagement.schema";
 import { toast } from "sonner";
 import { TResponse } from "@/types/global";
 import { academicManagementHooks } from "@/hooks/academicManagementHooks";
-import PHInput from "./form/PHInput";
-import PHSelect from "./form/PHSelect";
-import { TAcademicDepartmentTableData } from "@/pages/admin/academicManagement/AcademicDepartment";
+import PHInput from "../form/PHInput";
+import { zodResolver } from "@hookform/resolvers/zod";
+import PHSelect from "../form/PHSelect";
 
-export default function EditAcademicDepartment({
+export default function CreateAcademicDepartment({
   setIsModalOpen,
-  record
 }: {
   setIsModalOpen: (isOpen: boolean) => void;
-  record: TAcademicDepartmentTableData;
 }) {
   const handleOk = () => {
     setIsModalOpen(false);
@@ -22,9 +21,9 @@ export default function EditAcademicDepartment({
   const handleCancel = () => {
     setIsModalOpen(false);
   };
-  const { useUpdateAcademicDepartmentMutation, useGetAllAcademicFacultyQuery } =
+  const { useAddAcademicDepartmentMutation, useGetAllAcademicFacultyQuery } =
     academicManagementHooks;
-    const [updateAcademicDepartment] = useUpdateAcademicDepartmentMutation();
+  const [addAcademicDepartment] = useAddAcademicDepartmentMutation();
   const { data: academicFacultyData, isFetching } =
     useGetAllAcademicFacultyQuery();
   const academicFacultyOptions = academicFacultyData?.data?.map(
@@ -35,19 +34,18 @@ export default function EditAcademicDepartment({
   );
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
-    const toastId = toast.loading("Updating Academic Department....");
+    const toastId = toast.loading("Creating Academic Department....");
     const departmentData = {
       name: data.name,
       academicFaculty: data.academicFaculty,
     };
     try {
-      const res = (await updateAcademicDepartment({
-        id: record._id,
-        data: departmentData,
+      const res = (await addAcademicDepartment(
+        departmentData
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      })) as TResponse<any>;
+      )) as TResponse<any>;
       if (res.data) {
-        toast.success("Academic Department Updated Successfully", {
+        toast.success("Academic Department Created Successfully", {
           id: toastId,
         });
         handleOk();
@@ -67,18 +65,14 @@ export default function EditAcademicDepartment({
     <Flex align="center">
       <Col span={24}>
         <h1 className="text-center font-bold mb-5 text-xl">
-          Update Department
+          Create New Department
         </h1>
         <PHForm
           onSubmit={onSubmit}
-          defaultValues={{
-            name: record.name,
-            academicFaculty: record.academicFaculty,
-          }}
+          resolver={zodResolver(academicDepartmentSchema)}
         >
           <PHInput name="name" type="text" label="Department Name" />
-         {
-          isFetching ? (
+          {isFetching ? (
             <div className="flex justify-center items-center">
               <div className="animate-spin rounded-full mb-5 h-10 w-10 border-t-2 border-b-2 border-blue-900"></div>
             </div>
@@ -88,11 +82,10 @@ export default function EditAcademicDepartment({
               name="academicFaculty"
               options={academicFacultyOptions}
             />
-          )
-         }
+          )}
           <div className="flex justify-center gap-2">
             <Button type="primary" htmlType="submit">
-              Update
+              Submit
             </Button>
             <Button onClick={handleCancel} type="primary" danger>
               Cancel
